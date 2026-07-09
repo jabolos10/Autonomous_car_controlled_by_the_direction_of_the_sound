@@ -3,12 +3,12 @@
 #include <WebServer.h>
 
 #define LED_PIN 38
-#define MIC_PIN_1 1      // lewy mikrofon GPIO1
-#define MIC_PIN_2 2      // prawy mikrofon GPIO2
-#define MIC_PIN_3 4      // przedni mikrofon GPIO4 (ADC1_3)
-#define MIC_PIN_4 10     // tylny mikrofon GPIO10 (ADC1_9)
+#define MIC_PIN_1 1      // left mic GPIO1
+#define MIC_PIN_2 2      // right mic GPIO2
+#define MIC_PIN_3 4      // front mic GPIO4 (ADC1_3)
+#define MIC_PIN_4 10     // back mic GPIO10 (ADC1_9)
 
-// Piny dla L298N
+// Pins for L298N
 int ENA = 20;
 int IN1 = 14;
 int IN2 = 13;
@@ -19,35 +19,35 @@ int IN4 = 9;
 Adafruit_NeoPixel strip(1, LED_PIN, NEO_GRB + NEO_KHZ800);
 WebServer server(80);
 
-// === KONFIGURACJA WiFi ===
+// === WiFi CONFIGURATION ===
 const char* ssid = "ESP32_Microfon";
 const char* password = "12345678";
 
-// Ustawienia dla mikrofonow
+// Microphone settings
 const int MIN_READING = 50;
 const int MAX_READING = 350;
 const int SOUND_THRESHOLD = 200;
 
-// Zmienne dla trybu skokowego
+// Variables for the step-based mode
 enum State { COLLECTING, SHOWING, EXECUTING };
 State currentState = COLLECTING;
 
 unsigned long stateStartTime = 0;
-const unsigned long COLLECT_DURATION = 5000;  // 5 sekund zbierania
-const unsigned long SHOW_DURATION = 2000;     // 2 sekundy wyswietlania
-const unsigned long EXECUTE_DURATION = 3000;  // 3 sekundy jazdy (forward/backward)
+const unsigned long COLLECT_DURATION = 5000;  // 5 seconds of collecting
+const unsigned long SHOW_DURATION = 2000;     // 2 seconds of showing the result
+const unsigned long EXECUTE_DURATION = 3000;  // 3 seconds of driving (forward/backward)
 
-// Zmienne do przechowywania max wartości
+// Variables for storing the peak values
 int maxValues[4] = {0, 0, 0, 0};
 String lastDirection = "none";
 int lastRed = 0, lastGreen = 0, lastBlue = 0;
 
-// Zmienne dla timera auta
+// Variables for the car's timer
 unsigned long moveEndTime = 0;
 bool isMoving = false;
 bool waitingForForward = false;
 
-// ===== FUNKCJE STEROWANIA AUTEM =====
+// ===== CAR CONTROL FUNCTIONS =====
 void stopMotors()
 {
   digitalWrite(IN1, LOW);
@@ -119,7 +119,7 @@ void executeDirection(String direction)
   }
 }
 
-// ===== FUNKCJE MIKROFONOW =====
+// ===== MICROPHONE FUNCTIONS =====
 String getDirectionFromMax() {
   if (maxValues[0] > SOUND_THRESHOLD &&
       maxValues[0] > maxValues[1] &&
@@ -154,7 +154,7 @@ void resetMaxValues() {
   }
 }
 
-// Strona HTML (ta sama co wczesniej)
+// HTML page (same as before)
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html>
@@ -567,12 +567,12 @@ void setup() {
   Serial.begin(115200);
   analogReadResolution(12);
 
-  // inicjalizacja LED RGB
+  // initialise RGB LED
   strip.begin();
   strip.setBrightness(50);
   strip.show();
 
-  // inicjalizacja pinow silnikow
+  // initialise motor pins
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -583,7 +583,7 @@ void setup() {
   digitalWrite(ENB, HIGH);
   stopMotors();
 
-  // uruchom WiFi
+  // start WiFi
   WiFi.softAP(ssid, password);
   Serial.println("WiFi AP started");
   Serial.print("IP Address: ");
@@ -681,7 +681,7 @@ void setup() {
 void loop() {
   server.handleClient();
 
-  // obsluga timera auta (jazda)
+  // handle the car's driving timer
   if (isMoving && millis() >= moveEndTime) {
     if (waitingForForward) {
       Serial.println("Turn finished, going forward for 3s");
@@ -692,7 +692,7 @@ void loop() {
     }
   }
 
-  // obsluga stanow mikrofonow
+  // handle the microphone state machine
   static unsigned long lastCheck = 0;
   if (millis() - lastCheck > 10) {
     lastCheck = millis();
@@ -711,7 +711,7 @@ void loop() {
       Serial.print("Result - direction: ");
       Serial.println(lastDirection);
 
-      // AUTOMATYCZNE WYKONANIE KOMENDY
+      // AUTOMATIC COMMAND EXECUTION
       if (lastDirection != "none") {
         Serial.println("🚗 EXECUTING THE COMMAND AUTOMATICALY!");
         executeDirection(lastDirection);

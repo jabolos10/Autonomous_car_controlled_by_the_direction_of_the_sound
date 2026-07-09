@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
-// Piny dla L298N
+// Pins for L298N
 int ENA = 20;
 int IN1 = 14;
 int IN2 = 13;
@@ -14,10 +14,10 @@ WebServer server(80);
 const char* ssid = "ESPcar";
 const char* password = "12345678";
 
-// Zmienne do obsługi timerów
+// Timer handling variables
 unsigned long moveEndTime = 0;
 bool isMoving = false;
-bool waitingForForward = false;  // flaga czy czekamy na jazdę prosto po skręcie
+bool waitingForForward = false;  // flag: are we waiting to drive straight after a turn
 
 void stopMotors()
 {
@@ -37,11 +37,11 @@ void forward()
   digitalWrite(IN4, HIGH);
 
   if (waitingForForward) {
-    // To jest jazda prosto po skręcie - 2.4s
+    // This is driving straight after a turn - 2.4s
     moveEndTime = millis() + 2400;
     waitingForForward = false;
   } else {
-    // Normalna jazda do przodu - 3s
+    // Normal forward drive - 3s
     moveEndTime = millis() + 3000;
   }
   isMoving = true;
@@ -60,26 +60,26 @@ void backward()
 
 void left()
 {
-  // Najpierw skręt w lewo (0.6s)
+  // First turn left (0.6s)
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
   moveEndTime = millis() + 600;
   isMoving = true;
-  waitingForForward = true;  // Po skręcie jedziemy prosto
+  waitingForForward = true;  // Drive straight after the turn
 }
 
 void right()
 {
-  // Najpierw skręt w prawo (0.6s)
+  // First turn right (0.6s)
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
   moveEndTime = millis() + 600;
   isMoving = true;
-  waitingForForward = true;  // Po skręcie jedziemy prosto
+  waitingForForward = true;  // Drive straight after the turn
 }
 
 void setup()
@@ -184,16 +184,16 @@ void loop()
 {
   server.handleClient();
 
-  // Sprawdzanie timera
+  // Checking the timer
   if (isMoving && millis() >= moveEndTime) {
     if (waitingForForward) {
-      // Po skręcie - jedziemy prosto
-      Serial.println("Skręt zakończony, jadę prosto przez 2.4s");
-      forward();  // to wywołanie forward z waitingForForward = true
+      // Turn finished - drive straight
+      Serial.println("Turn finished, driving straight for 2.4s");
+      forward();  // this forward() call runs with waitingForForward = true
     } else {
-      // Koniec ruchu - zatrzymaj
+      // End of move - stop
       stopMotors();
-      Serial.println("Auto zatrzymane po czasie");
+      Serial.println("Car stopped after timeout");
     }
   }
 
