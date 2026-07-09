@@ -6,6 +6,10 @@ Built for the *Electrical Drives* course at **Poznań University of Technology**
 
 ![Assembled vehicle](docs/images/vehicle_photo.jpg)
 
+## Demo
+
+📹 **[Watch the car in action](docs/video/demo.mp4)** — full sound-detection → drive → dashboard cycle, recorded live.
+
 ---
 
 ## How it works
