@@ -1,5 +1,7 @@
 # 🎤 Autonomous Car Controlled by the Direction of the Sound
 
+[![Watch the demo on YouTube](https://img.shields.io/badge/YouTube-Watch%20the%20demo-red?logo=youtube&logoColor=white)](https://youtube.com/shorts/5ZmE8uIfUPI)
+
 An ESP32-S3 powered rover that **listens** for a sound, figures out which direction it came from, and drives toward it — all while streaming a live dashboard over its own Wi-Fi access point. No app, no remote, no internet connection required: open a browser, point it at `192.168.4.1`, and watch the car think.
 
 Built for the *Electrical Drives* course at **Poznań University of Technology**, Faculty of Control, Robotics and Electrical Engineering.
@@ -8,7 +10,9 @@ Built for the *Electrical Drives* course at **Poznań University of Technology**
 
 ## Demo
 
-📹 **[Watch the car in action](docs/video/demo.mp4)** — full sound-detection → drive → dashboard cycle, recorded live.
+▶️ **[Watch on YouTube](https://youtube.com/shorts/5ZmE8uIfUPI)** — the car in action, full sound-detection → drive → dashboard cycle.
+
+📹 Local copy also available in the repo: [`docs/video/demo.mp4`](docs/video/demo.mp4)
 
 ---
 
